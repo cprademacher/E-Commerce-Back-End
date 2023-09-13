@@ -1,6 +1,10 @@
 const router = require("express").Router();
 const sequelize = require("../../config/connection");
 const { Category, Product } = require("../../models");
+const express = require("express");
+const app = express();
+
+app.use(express.json());
 
 // The `/api/categories` endpoint
 
@@ -21,26 +25,31 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  // find one category by its `id` value
-  // be sure to include its associated Products
   try {
     const categoryData = await Category.findByPk(req.params.id, {
-      include: [{ model: Product }],
+      include: [
+        {
+          model: Product,
+          attributes: ["id", "product_name", "price", "stock"],
+        },
+      ],
       attributes: {
         include: [
           [
             sequelize.literal(
-              "(SELECT * FROM product WHERE product.category_id = category_id))"
+              "(SELECT COUNT(*) FROM product WHERE product.category_id = category_id)"
             ),
-            "products",
+            "product_count",
           ],
         ],
       },
     });
+
     if (!categoryData) {
       res.status(404).json({ message: "Category with that id not found." });
       return;
     }
+
     console.log(categoryData);
     res.status(200).json(categoryData);
   } catch (err) {
@@ -51,12 +60,19 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   // create a new category
   try {
-    const categoryData = await Category.create(req.body);
+    const categoryData = await Category.create({
+      category_name: req.body.category_name,
+    });
     res.status(201).json(categoryData);
   } catch (err) {
+    console.err(err);
     res.status(500).json(err);
   }
 });
+
+// the above is not working, I think it might be because the content type
+// when I try to post is text/html; charset=utf-8 but I can't figure out
+// how to fix that.
 
 router.put("/:id", async (req, res) => {
   // update a category by its `id` value
