@@ -75,10 +75,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// the above is not working, I think it might be because the content type
-// when I try to post is text/html; charset=utf-8 but I can't figure out
-// how to fix that.
-
 router.put("/:id", async (req, res) => {
   // update a category by its `id` value
   try {
