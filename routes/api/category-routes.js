@@ -3,7 +3,6 @@ const sequelize = require("../../config/connection");
 const { Category, Product } = require("../../models");
 const express = require("express");
 const app = express();
-
 app.use(express.json());
 
 // The `/api/categories` endpoint
@@ -48,10 +47,9 @@ router.get("/:id", async (req, res) => {
     if (!categoryData) {
       res.status(404).json({ message: "Category with that id not found." });
       return;
+    } else {
+      res.status(200).json(categoryData);
     }
-
-    console.log(categoryData);
-    res.status(200).json(categoryData);
   } catch (err) {
     res.status(500).json(err);
   }
@@ -60,12 +58,19 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   // create a new category
   try {
-    const categoryData = await Category.create({
-      category_name: req.body.category_name,
+    const { category_name } = req.body;
+
+    if (!category_name) {
+      return res.status(400).json({ error: "Category name is required" });
+    }
+
+    const newCategory = await Category.create({
+      category_name,
     });
-    res.status(201).json(categoryData);
+
+    res.status(201).json(newCategory);
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(500).json(err);
   }
 });
