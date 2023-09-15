@@ -31,3 +31,5 @@ I was given starter code from the staff at the UT Coding boot camp which I had t
 MIT
 
 ## Link to video walkthrough.
+
+https://drive.google.com/file/d/12KTQfOG7LStghZOg16jv2m9a-CCvsnij/view
